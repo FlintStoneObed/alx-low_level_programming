@@ -1,19 +1,14 @@
-#include "main.h"
+#include <unistd.h>
 
-/**
- * print_alphabet - This function prints the english alphabets in lowercase
- *
- * Return: no return value
- */
-
-void print_alphabet(void)
+int main(void)
 {
-	int lower;
+char s[] = "_putchar\n";
+int i = 0;
 
-	for (lower = 'a'; lower <= 'z'; lower++)
-	{
-		_putchar(lower);
-	}
-	_putchar('\n');
-
+while (s[i])
+{
+write(1, &s[i], 1);
+I++;
+}
+return (0);
 }
