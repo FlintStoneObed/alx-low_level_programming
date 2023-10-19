@@ -1,31 +1,27 @@
 #include "main.h"
 
 /**
- * _strncat - concatenates two strings, using at most n bytes from src;
- * and src does not need to be null-terminated if it contains n or more bytes
- * @dest: input value
- * @src: input value
- * @n: input value
- * Retun: dest
+ * _strncat - concatenate two strings
+ * @dest: destination string buffer
+ * @src: source string buffer
+ * @n: number of bytes to write
+ *
+ * Description: Appends @n bytes from @src to @dest.The @dest string needs
+ * to be large enough to contain the resultant string.
+ *
+ * Return: pointer to the resulting string @dest
  */
 
 char *_strncat(char *dest, char *src, int n)
 {
-	int i;
-	int j;
+	int len, i;
 
-	i = 0;
-	while (dest[i] != '\0')
-	{
-		i++;
-	}
-	j = 0;
-	while (j < n && src[j] != '\0')
-	{
-	dest[i] = src[j];
-	i++;
-	j++;
-	}
-	dest[i] = '\0';
+	for (len = 0; dest[len] != '\0'; len++)
+		;
+
+	for (i = 0; i < n && src[i] != '\0'; i++)
+		dest[len++] = src[i];
+	dest[len] = '\0';
+
 	return (dest);
 }
