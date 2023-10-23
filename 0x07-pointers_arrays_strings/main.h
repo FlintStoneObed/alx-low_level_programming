@@ -1,7 +1,7 @@
 #ifndef _MAIN_H_
 #define _MAIN_H_
 
-#define NULL ((voi*)0)
+#define NULL ((void*)0)
 
 int _putchar(int c);
 char *_memset(char *s, char b, unsigned int n);
