@@ -1,4 +1,4 @@
-i#include "main.h"
+#include "main.h"
 
 /**
  * is_prime_recursive - Recursive helper function to check if a number is prime
