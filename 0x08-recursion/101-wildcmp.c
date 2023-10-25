@@ -18,7 +18,7 @@
 int wildcmp(char *s1, char *s2)
 {
 	/* s2 starts with '*' but s1 is empty - there's nothing more to do */
-	if ((*2 == '*' && *(s2 + 1) != '\0') && *s1 == '\0')
+	if ((*s2 == '*' && *(s2 + 1) != '\0') && *s1 == '\0')
 		return (0);
 
 	/* both strings are empty - so they are the same */
