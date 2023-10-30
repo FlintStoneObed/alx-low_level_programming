@@ -19,20 +19,21 @@ char *str_concat(char *s1, char *s2)
 	check_null(s2);
 
 	len = strlen(s1) + strlen(s2);
-		
+
 	new_string = (char *) malloc(len + 1);
 
 	if (new_string == NULL)
-		retrun (NULL);
+		return (NULL);
+
 	i = 0;
 	while (*(s1 + i))
 	{
-		*(new_string + i) = *(s1 +i);
+		*(new_string + i) = *(s1 + i);
 		i++;
 	}
 
 	j = i;
-	
+
 	i = 0;
 	while (*(s2 + i))
 	{
