@@ -32,7 +32,7 @@ char *argstostr(int argc, char **argv)
 	for (i = 0; i < argc; i++)
 	{
 		strcat(new_string, argv[i]);
-		strcat)new_string, "\n");
+		strcat(new_string, "\n");
 	}
 
 	return (new_string);
