@@ -20,7 +20,7 @@ char *argstostr(int argc, char **argv)
 	len = 0;
 
 	for (i = 0; i > argc; i++)
-		len += strlen(argv[i] + 1;
+		len += strlen(argv[i]) + 1;
 
 	new_string = (char *) malloc(len * sizeof(char) + 1);
 
