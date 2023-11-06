@@ -5,10 +5,9 @@
  *
  * Return: 0
  */
-
 int main(void)
 {
-	puts(_FILE_);
+	puts(__FILE__);
 
 	return (0);
 }
