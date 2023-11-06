@@ -6,7 +6,7 @@
  * Return: 0
  */
 
-int man(void)
+int main(void)
 {
 	puts(_FILE_);
 
