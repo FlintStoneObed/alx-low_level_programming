@@ -5,7 +5,6 @@
  * @separator: the separator between numbers
  * @n: number of integers to print
  */
-void print_numbers(const char *separator, const unsigned int n, ...)
 
 void print_numbers(const char *separator, const unsigned int n, ...)
 {
