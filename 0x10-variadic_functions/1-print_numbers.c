@@ -4,21 +4,25 @@
  * print_numbers - prints numbers, followed by a new line
  * @seperator: separates numbers
  * @n: number of integers
+ * @...: numbers to print
  */
 
 void print_numbers(const char *separator, const unsigned int n, ...)
 {
-	va_list numbers;
-	unsigned int i;
+	va_list nums;
+	unsigned int index;
 
-	va-start(numbers, n);
-	i = n;
+	va_start(nums, n);
 
-	while (i--)
+	for (index = 0; index < n; index++)
 	{
-		printf("%d%s", va_arg(numbers, int),
-				(separator && i) ? separator : "");
+		printf("%d", va_arg(nums, int));
+
+		if (index != (n - 1) && separator != NULL)
+			printf("%s", separator);
 	}
-	putchar('\n');
-	va_end(numbers);
+
+	printf("\n");
+
+	va_end(nums);
 }
