@@ -1,9 +1,10 @@
-#include "variadic_function.h"
+#include "variadic_functions.h"
 
 /**
- * sun_them_all - returns the sum of all its parameters
- * @n: sum of parameters
- * Return: Success 0
+ * sum_them_all - returns the sum of all its parameters
+ * @n: number of integers to sum
+ *
+ * Return: the sum of all its arguments
  */
 
 int sum_them_all(const unsigned int n, ...)
