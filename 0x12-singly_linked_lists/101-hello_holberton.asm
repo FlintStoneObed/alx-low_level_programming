@@ -1,18 +1,28 @@
+global main
+extern printf
+extern exit
+
 section .data
-	hello db 'Hello, Holberton', 0xA ; 0xA is the newline character
-	format db '%s', 0 ; Format string for printf
+    message db "Hello, Holberton", 10, 0
 
 section .text
-	global main
-	extern printf, fflush
-
 main:
-	sub rsp, 8 ; Align the stack
-	mov rdi, format ; Set rdi to point to the format string
-	mov rsi, hello ; Set rsi to point to the hello string
-	call printf ; Call the printf function
+    push rdi
+    mov rdi, message
+    call printf
+    pop rdi
 
-	add rsp, 8 ; Restor the stack
-	call fflush ; Flush the output buffer
-	ret ; Return from the program
+    ; check the return value from printf
+    cmp rax, -1
+    je .error_handler ; error occured, handle it
 
+    ; exit the program gracefully with code 0
+    mov rdi, 0
+    call exit
+
+.error_handler:
+    ; handle errors that occured during the call to printf
+
+    ; exit with 1
+    mov rdi, 1
+    call exit
