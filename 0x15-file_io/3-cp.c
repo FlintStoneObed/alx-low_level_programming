@@ -1,127 +1,107 @@
 #include "main.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <fcntl.h>
-#include <unistd.h>
-
-#define BUFFER_SIZE 1024
 
 /**
- * main - Entry point of the program.
- * @program_name: Name of the program
- * Return: Exit status.
+ * main - copies files
+ * @argc: arguments counter
+ * @argv: the command line arguments (expects two: src file and dest file)
+ *
+ * Return: 0 on success, or exits with a specific status code
  */
-
-void display_usage(char *program_name);
-int open_source_file(char *filename);
-int open_destination_file(char *filename);
-void copy_file_content(int source_fd, int dest_fd);
-void handle_error(char *message, char *filename, int source_fd, int dest_fd);
-
 int main(int argc, char *argv[])
 {
-int source_fd, dest_fd;
+	char buffer[BUFF_LEN];
+	int fd_in, fd_out;
 
-if (argc != 3)
-{
-display_usage(argv[0]);
-exit(97);
-}
+	if (argc != 3)
+	{
+		print_cp_usage();
+		exit(INVALID_NARGS); /* invalid number of arguments */
+	}
 
-source_fd = open_source_file(argv[1]);
-dest_fd = open_destination_file(argv[2]);
+	fd_in = open(argv[1], O_RDONLY);
+	if (fd_in == -1)
+	{
+		print_read_fail(argv[1]);
+		exit(NO_SUCH_FILE); /* the file doesn't exist or user lacks permissions */
+	}
 
-copy_file_content(source_fd, dest_fd);
+	fd_out = open(argv[2], O_CREAT | O_WRONLY | O_TRUNC, 0664);
+	if (fd_out == -1)
+	{
+		print_write_fail(argv[2]);
+		close_fds(1, fd_in);
+		exit(WRITE_FAIL);
+	}
 
-close(source_fd);
-close(dest_fd);
+	cp(fd_in, fd_out, buffer, argv[2], argv[1]); /* perform copy operation */
 
-return (0);
-}
-
-/**
- * display_usage - Displays the correct usage of the program.
- * @program_name: The name of the program.
- */
-
-void display_usage(char *program_name)
-{
-dprintf(2, "Usage: %s file_from file_to\n", program_name);
-}
-
-/**
- * open_source_file - Opens the source file for reading.
- * @filename: Name of source file.
- * Return: The file descriptor of the opened source file.
- */
-
-int open_source_file(char *filename)
-{
-int source_fd = open(filename, O_RDONLY);
-if (source_fd == -1)
-{
-handle_error("Error: Can't read from file", filename, -1, -1);
-}
-return (source_fd);
+	return (0);
 }
 
 /**
- * open_destination_file - Opens the destination file for writing.
- * @filename: Name of the destination file.
- * Return: File descriptor of the opened destination file.
+ * cp - copies the contents from one file descriptor another
+ * @fd_in: the input file descriptor
+ * @fd_out: the output file descriptor
+ * @buffer: the buffer to write to
+ * @dest_file: the name of the destination file
+ * @src_file: the name of the source file
  */
+void cp(int fd_in, int fd_out, char *buffer, char *dest_file, char *src_file)
+{
+	ssize_t n_read, n_write;
 
-int open_destination_file(char *filename)
-{
-int dest_fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0664);
-if (dest_fd == -1)
-{
-handle_error("Error: Can't write to", filename, -1, -1);
-}
-return (dest_fd);
+	while ((n_read = read(fd_in, buffer, BUFF_LEN)) > 0)
+	{
+		n_write = write(fd_out, buffer, n_read);
+
+		/*
+		 * let's ensure the copy operation is working and the right number of
+		 * bytes are being written to the destination file
+		 */
+		if (n_write == -1 || n_write != n_read)
+		{
+			print_write_fail(dest_file);
+			close_fds(2, fd_in, fd_out);
+			exit(WRITE_FAIL);
+		}
+	}
+
+	/* ouch, reading from source file failed */
+	if (n_read == -1)
+	{
+		print_read_fail(src_file);
+		close_fds(2, fd_in, fd_out);
+		exit(READ_FAIL);
+	}
+
+	/* the operation was successful, now close the file descriptors */
+	close_fds(2, fd_in, fd_out);
 }
 
 /**
- * copy_file_content - Copies the content from source file to destination file.
- * @source_fd: File descriptor of the source file.
- * @dest_fd: File descriptor of the destination file.
+ * close_fds - close file descriptors
+ * @nfds: number of file descriptors to close
+ *
+ * Return: 0 on success, else exits with status code 100
  */
-
-void copy_file_content(int source_fd, int dest_fd)
+int close_fds(int nfds, ...)
 {
-ssize_t bytes_read, bytes_written;
-char buffer[BUFFER_SIZE];
+	va_list fds;
+	int fd;
 
-while ((bytes_read = read(source_fd, buffer, BUFFER_SIZE)) > 0)
-{
-bytes_written = write(dest_fd, buffer, bytes_read);
-if (bytes_written == -1 || bytes_written != bytes_read)
-{
-handle_error("Error: Can't write to", "", source_fd, dest_fd);
-}
-}
+	va_start(fds, nfds);
 
-if (bytes_read == -1)
-{
-handle_error("Error: Can't read from file", "", source_fd, dest_fd);
-}
-}
+	while (nfds--)
+	{
+		fd = va_arg(fds, int);
+		if (close(fd) == -1)
+		{
+			va_end(fds);
+			print_close_fail(fd);
+			exit(CLOSE_FAIL);
+		}
+	}
 
-/**
- * handle_error - Handles errors, displays error message,exits program.
- * @message: Error message.
- * @filename: Relevant filename.
- * @source_fd: File descriptor of the source file.
- * @dest_fd: File descriptor of the destination file.
- */
-
-void handle_error(char *message, char *filename, int source_fd, int dest_fd)
-
-{
-dprintf(2, "%s %s\n", message, filename);
-if (source_fd != -1)
-close(source_fd);
-if (dest_fd != -1)
-close(dest_fd);
-exit(99);
+	va_end(fds);
+	return (0);
 }
